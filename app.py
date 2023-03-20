@@ -7,6 +7,7 @@ keys = {
     'эфириум':'ETH',
     'доллар': 'USD'
 }
+
 #one line
 bot = telebot.TeleBot(TOKEN)
 
