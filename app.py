@@ -1,3 +1,6 @@
+import json
+import requests
+
 import telebot
 
 TOKEN = '6091943863:AAFubE3amsd38QZMJaGSKzVxrg2CBRx1GU4'
@@ -25,6 +28,21 @@ def available_currencies(message: telebot.types.Message):
 
     for k in keys:
         text = '\n'.join((text, k))
-    bot.reply_to(message, text)
+    bot.reply_to(message,text)
+
+@bot.message_handler(content_types=['text', ])
+def convert(message: telebot.types.Message):
+    from_, to_, amount_ = message.text.split(' ')
+
+    r = requests.get(f"https://min-api.cryptocompare.com/data/price?fsym={keys[from_]}&tsyms={keys[to_]}")
+
+    # if json.loads(r.content)["Response"] and json.loads(r.content)["Response"] == "Error":
+    #     text = "Система не может перевести указанную валюту. Еще раз ознакомьтесь со списком конвертируемых валют, введя команду /curr"
+
+    answer_to_user = json.loads(r.content)[keys[to_]]
+
+    text = f'Цена {amount_} {from_} в {to_}: {int(answer_to_user)*int(amount_)}'
+    bot.send_message(message.chat.id, text)
+
 
 bot.polling()
