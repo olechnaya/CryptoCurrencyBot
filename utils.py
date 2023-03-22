@@ -16,22 +16,19 @@ class CryptoConverter:
         try:
             from_ticker = keys[from_]
         except KeyError:
-            raise APIException(f"{from_} - данная валюта не найдена в списке возможных для конвертации")
+            raise APIException(f"*{from_}* - данная валюта не найдена в списке возможных для конвертации")
 
         try:
             to_ticker = keys[to_]
         except KeyError:
-            raise APIException(f"{to_} - данная валюта не найдена в списке возможных для конвертации")
+            raise APIException(f"*{to_}* - данная валюта не найдена в списке возможных для конвертации")
         try:
             amount_ = float(amount_)
         except ValueError:
-            raise APIException(f'Не удалось обработать количество {amount_}')
+            raise APIException(f'Не удалось обработать количество *{amount_}*')
 
         r = requests.get(
             f"https://min-api.cryptocompare.com/data/price?fsym={from_ticker}&tsyms={to_ticker}")
-
-        # if json.loads(r.content)["Response"] and json.loads(r.content)["Response"] == "Error":
-        #     text = "Система не может перевести указанную валюту. Еще раз ознакомьтесь со списком конвертируемых валют, введя команду /curr"
 
         answer_to_user = json.loads(r.content)[keys[to_]]
         return answer_to_user

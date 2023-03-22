@@ -35,7 +35,7 @@ def convert(message: telebot.types.Message):
         answer_to_user = CryptoConverter.convert(from_, to_, amount_)
 
     except APIException as e:
-        bot.reply_to(message, f"Ошибка ввода пользователем:\n  - {e}")
+        bot.reply_to(message, f"Ошибка ввода пользователем:\n  - {e}", parse_mode= 'Markdown' )
     except Exception as e:
         bot.reply_to(message, f"Не удалось обработать команду\n{e}")
     else:
@@ -43,4 +43,4 @@ def convert(message: telebot.types.Message):
         bot.send_message(message.chat.id, text)
 
 
-bot.polling()
+bot.infinity_polling()
