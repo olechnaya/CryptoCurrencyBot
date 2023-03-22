@@ -1,17 +1,7 @@
-import json
-import requests
-
 import telebot
+from config import keys, TOKEN
+from utils import CryptoConverter,APIException
 
-TOKEN = '6091943863:AAFubE3amsd38QZMJaGSKzVxrg2CBRx1GU4'
-
-keys = {
-    'биткоин':'BTC',
-    'эфириум':'ETH',
-    'доллар': 'USD'
-}
-
-#one line
 bot = telebot.TeleBot(TOKEN)
 
 @bot.message_handler(commands=['start', 'help'])
@@ -22,7 +12,7 @@ def help(message: telebot.types.Message):
 Увидеть список всех доступных валют: <curr>'
     bot.reply_to(message, text)
 
-@bot.message_handler(commands=['curr'])
+@bot.message_handler(commands=['values'])
 def available_currencies(message: telebot.types.Message):
     text = 'Доступные валюты:'
 
@@ -32,17 +22,25 @@ def available_currencies(message: telebot.types.Message):
 
 @bot.message_handler(content_types=['text', ])
 def convert(message: telebot.types.Message):
-    from_, to_, amount_ = message.text.split(' ')
+    try:
+        # создали отдельную переменную чтобы отлавливать некорректно введенные данные
+        user_input = message.text.split(' ')
 
-    r = requests.get(f"https://min-api.cryptocompare.com/data/price?fsym={keys[from_]}&tsyms={keys[to_]}")
+        if len(user_input) < 3:
+            raise APIException('Мало параметров')
+        elif len(user_input) > 3:
+            raise APIException('Много параметров')
 
-    # if json.loads(r.content)["Response"] and json.loads(r.content)["Response"] == "Error":
-    #     text = "Система не может перевести указанную валюту. Еще раз ознакомьтесь со списком конвертируемых валют, введя команду /curr"
+        from_, to_, amount_ = user_input
+        answer_to_user = CryptoConverter.convert(from_, to_, amount_)
 
-    answer_to_user = json.loads(r.content)[keys[to_]]
-
-    text = f'Цена {amount_} {from_} в {to_}: {int(answer_to_user)*int(amount_)}'
-    bot.send_message(message.chat.id, text)
+    except APIException as e:
+        bot.reply_to(message, f"Ошибка ввода пользователем:\n  - {e}")
+    except Exception as e:
+        bot.reply_to(message, f"Не удалось обработать команду\n{e}")
+    else:
+        text = f'Цена {amount_} {from_} в {to_}: {float(answer_to_user)*float(amount_)}'
+        bot.send_message(message.chat.id, text)
 
 
 bot.polling()
