@@ -9,7 +9,7 @@ def help(message: telebot.types.Message):
     text = 'Чтобы начать работу с валютой нужно ввести команду в чате:\n<имя валюты> \
 <в какую валюту перевести> \
 <какое количество нужно переввести>\
-Увидеть список всех доступных валют: <curr>'
+Увидеть список всех доступных валют: <values>'
     bot.reply_to(message, text)
 
 @bot.message_handler(commands=['values'])
